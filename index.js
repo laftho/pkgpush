@@ -1,8 +1,11 @@
 #!/bin/node
 
 import { readdir, readFile, writeFile } from "node:fs/promises";
+import { promisify } from "node:util";
 import { exec } from "node:child_process";
 import { EOL } from "node:os";
+
+const pexec = promisify(exec);
 
 if (!process.argv.includes("--filter") || process.argv.includes("--help")) {
     console.log(`
@@ -88,23 +91,38 @@ for await (const pkgFile of findProjectPackages(process.cwd())) {
             await writeFile(depPkgFile, JSON.stringify(depPkg, undefined, 2), { encoding: "utf-8" });
         }
 
-        process.stdout.write("packing");
+        process.stdout.write(" packing");
 
-        exec(`npm pack --ignore-scripts ${depPath.pathname}`);
+        const packResult = await pexec(`npm pack --ignore-scripts ${depPath.pathname}`);
+
+        if (packResult.error) {
+            console.error(packResult.error);
+            throw packResult.error;
+        }
 
         if (s3destination) {
             process.stdout.write(" uploading");
 
-            exec(`aws s3 cp ${prepName}.tgz s3://${s3destination}/${process.env.USERNAME || process.env.USER || "anon"}/${prepName}.tgz`)
+            const result = await pexec(`aws s3 cp ${prepName}.tgz s3://${s3destination}/${process.env.USERNAME || process.env.USER || "anon"}/${prepName}.tgz`)
+
+            if (result.error) {
+                console.error(result.error);
+                throw result.error;
+            }
         }
 
         if (shouldPublish) {
             process.stdout.write(" publishing");
 
-            exec(`npm publish --ignore-scripts ${prepName}.tgz`);
+            const result = await pexec(`npm publish --ignore-scripts ${prepName}.tgz`);
+
+            if (result.error) {
+                console.error(result.error);
+                throw result.error;
+            }
         }
 
-        process.stdout.write(`done${EOL}`);
+        process.stdout.write(` done${EOL}`);
 
         processedVersions.add(prepName);
     }
