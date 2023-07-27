@@ -1,0 +1,15 @@
+{
+  "name": "pkgpush",
+  "version": "1.0.0",
+  "description": "Utility to push node_module deps to s3 and/or publish",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "pkgpush": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thomas LaFreniere",
+  "license": "ISC"
+}
