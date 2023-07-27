@@ -77,7 +77,7 @@ for await (const pkgFile of findProjectPackages(process.cwd())) {
             continue;
         }
 
-        const prepName = `${dep.replace("@", "-").replace("/", "-")}-${depPkg.version}`;
+        const prepName = `${dep.replace("@", "").replace("/", "-")}-${depPkg.version}`;
 
         if (processedVersions.has(prepName)) {
             continue;
