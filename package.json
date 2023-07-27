@@ -1,6 +1,6 @@
 {
   "name": "pkgpush",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility to push node_module deps to s3 and/or publish",
   "main": "index.js",
   "type": "module",
